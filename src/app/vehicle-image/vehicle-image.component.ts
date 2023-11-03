@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { ImageState } from './vehicle-image-state/vehicle-image.actions';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -9,19 +9,12 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './vehicle-image.component.html',
   styleUrls: ['./vehicle-image.component.css']
 })
-export class VehicleImageComponent implements OnInit, OnDestroy {
-  public selectedImage = '';
-  onDestroy$: Subject<void> = new Subject();
+export class VehicleImageComponent implements OnInit {
+  public selectedImage$: Observable<any> | undefined;
 
   constructor(private store: Store<{ image: ImageState }>) {}
 
   ngOnInit() {
-    this.store.pipe(takeUntil(this.onDestroy$), select(state => state.image.imageUrl))
-    .subscribe(imageUrl => this.selectedImage = imageUrl);
-  }
-
-  ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.selectedImage$ = this.store.select('image');
   }
 }
